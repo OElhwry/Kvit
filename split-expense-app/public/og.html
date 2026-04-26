@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kvit · OG card preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <style>
+      /*
+        Open og.html in your browser, set the viewport to exactly 1200×630
+        (Chrome DevTools → Device toolbar → custom 1200×630), then use
+        DevTools' "Capture full size screenshot" command and save the result
+        as og.png in this same folder. It will be picked up by the OG /
+        Twitter meta tags in index.html on next build.
+      */
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        width: 1200px; height: 630px;
+        overflow: hidden;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-feature-settings: "tnum" on, "lnum" on;
+        color: #e6f4ec;
+        background:
+          radial-gradient(ellipse 60% 40% at 90% 10%,  rgba(52,211,153,0.18) 0%, transparent 65%),
+          radial-gradient(ellipse 55% 35% at 5% 95%,   rgba(16,185,129,0.10) 0%, transparent 70%),
+          linear-gradient(160deg, #0c1812 0%, #060c08 55%, #040a06 100%);
+        position: relative;
+      }
+      .dots {
+        position: absolute; inset: 0;
+        background-image: radial-gradient(circle, rgba(52,211,153,0.07) 1px, transparent 1px);
+        background-size: 30px 30px;
+        opacity: 0.7;
+      }
+      .stage {
+        position: relative; z-index: 1;
+        display: flex; flex-direction: column; justify-content: space-between;
+        height: 100%; padding: 76px 88px;
+      }
+      /* Header */
+      .header {
+        display: flex; align-items: center; gap: 18px;
+      }
+      .mark {
+        width: 78px; height: 78px; border-radius: 22px;
+        background: linear-gradient(140deg, #34d399 0%, #10b981 50%, #047857 100%);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 12px 40px rgba(52,211,153,0.32), inset 0 2px 0 rgba(255,255,255,0.18);
+      }
+      .mark svg { width: 38px; height: 38px; }
+      .brand {
+        display: flex; flex-direction: column;
+      }
+      .brand-name {
+        font-size: 36px; font-weight: 800; letter-spacing: -1px;
+        color: #f0fdf4;
+        display: flex; align-items: center; gap: 12px;
+      }
+      .brand-dot {
+        width: 9px; height: 9px; border-radius: 50%;
+        background: #34d399; box-shadow: 0 0 14px #34d399;
+      }
+      .brand-tag {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 16px; color: rgba(52,211,153,0.78);
+        letter-spacing: 0.04em; margin-top: 4px;
+      }
+
+      /* Headline */
+      .headline {
+        font-size: 110px; font-weight: 800; line-height: 0.96;
+        letter-spacing: -3.4px;
+        background: linear-gradient(180deg, #f0fdf4 0%, #6ee7b7 100%);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .headline em {
+        font-style: italic; font-weight: 800;
+        color: #34d399; -webkit-text-fill-color: #34d399;
+        text-shadow: 0 0 28px rgba(52,211,153,0.5);
+      }
+      .sub {
+        margin-top: 28px;
+        font-size: 28px; line-height: 1.4; color: rgba(230,244,236,0.78);
+        max-width: 880px; font-weight: 500;
+      }
+
+      /* Footer pills */
+      .pills {
+        display: flex; gap: 12px; flex-wrap: wrap;
+      }
+      .pill {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 18px; border-radius: 99px;
+        background: rgba(52,211,153,0.10);
+        border: 1px solid rgba(52,211,153,0.30);
+        color: rgba(230,244,236,0.92);
+        font-size: 18px; font-weight: 600; letter-spacing: 0.01em;
+      }
+      .pill .pdot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: #34d399; box-shadow: 0 0 10px #34d399;
+      }
+      .url {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 18px; color: rgba(110,231,183,0.7);
+        letter-spacing: 0.04em;
+      }
+      .footer {
+        display: flex; align-items: center; justify-content: space-between;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dots"></div>
+    <div class="stage">
+      <div class="header">
+        <div class="mark">
+          <!-- Inline KvitMark — split-K with deliberate gap at the junction -->
+          <svg viewBox="0 0 33.4 38" fill="none" aria-hidden="true">
+            <rect x="0" y="0" width="7.35" height="38" rx="3.67" fill="rgba(255,255,255,0.96)" />
+            <line x1="8.35" y1="14.78" x2="33.4" y2="1"  stroke="rgba(255,255,255,0.94)" stroke-width="6.25" stroke-linecap="round" />
+            <line x1="8.35" y1="23.22" x2="33.4" y2="37" stroke="rgba(255,255,255,0.94)" stroke-width="6.25" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div class="brand">
+          <div class="brand-name">Kvit <span class="brand-dot"></span></div>
+          <div class="brand-tag">~ call it even ~</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="headline">Split bills.<br><em>Settle in seconds.</em></div>
+        <div class="sub">A no-account expense splitter — equal, custom %, or by-time for shared bookings. Minimum-transactions settlement, no signup, all in the browser.</div>
+      </div>
+
+      <div class="footer">
+        <div class="pills">
+          <span class="pill"><span class="pdot"></span> No account</span>
+          <span class="pill">3 split modes</span>
+          <span class="pill">By Time · for padel, courts, hourly</span>
+        </div>
+        <div class="url">oelhwry.github.io/Kvit</div>
+      </div>
+    </div>
+  </body>
+</html>

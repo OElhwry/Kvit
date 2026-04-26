@@ -11,6 +11,12 @@ import {
   FileText, Link as LinkIcon, Image as ImageIcon, Check, Plus, ArrowRight,
   Sparkles, Clock, Scale, Percent, ChevronDown, RotateCcw,
 } from "lucide-react";
+import {
+  equalShare,
+  manualShare,
+  timeShare as calcTimeShare,
+  calcSettlements,
+} from "./lib/calc";
 
 const STORAGE_KEY = "kvit:state:v1";
 
@@ -993,27 +999,6 @@ const formatMins = (m) => {
   return `${h}h ${min}m`;
 };
 
-/** Minimise transactions: match debtors to creditors */
-function calcSettlements(people, getOwes) {
-  const debtors   = people.map(p => ({ name: p.name, bal:  getOwes(p) }))
-                          .filter(p => p.bal > 0.005).map(p => ({ ...p }))
-                          .sort((a, b) => b.bal - a.bal);
-  const creditors = people.map(p => ({ name: p.name, bal: -getOwes(p) }))
-                          .filter(p => p.bal > 0.005).map(p => ({ ...p }))
-                          .sort((a, b) => b.bal - a.bal);
-  const result = [];
-  let ci = 0, di = 0;
-  while (di < debtors.length && ci < creditors.length) {
-    const amt = Math.min(debtors[di].bal, creditors[ci].bal);
-    if (amt > 0.005) result.push({ from: debtors[di].name, to: creditors[ci].name, amount: amt });
-    debtors[di].bal   -= amt;
-    creditors[ci].bal -= amt;
-    if (debtors[di].bal   < 0.005) di++;
-    if (creditors[ci].bal < 0.005) ci++;
-  }
-  return result;
-}
-
 // ═════════════════════════════════════════════════════════════
 //  COMPONENT: CountUp — animates a number with motion values
 // ═════════════════════════════════════════════════════════════
@@ -1953,13 +1938,13 @@ export default function App() {
   // Booking duration only bounds the slider's max — multiple people can overlap.
   const totalPersonMinutes = people.reduce((s, p) => s + (Number(p.minutes) || 0), 0);
 
-  const getTimeShare = (p) =>
-    totalPersonMinutes > 0 ? (total * (Number(p.minutes) || 0)) / totalPersonMinutes : 0;
+  const getTimeShare = (p) => calcTimeShare(total, p.minutes, totalPersonMinutes);
 
   const getOwes = (p) => {
-    if (mode === "equal")  return total / people.length - (Number(p.paid) || 0);
-    if (mode === "manual") return (total * (Number(p.percent) || 0)) / 100 - (Number(p.paid) || 0);
-    return getTimeShare(p) - (Number(p.paid) || 0);
+    const paid = Number(p.paid) || 0;
+    if (mode === "equal")  return equalShare(total, people.length) - paid;
+    if (mode === "manual") return manualShare(total, p.percent)    - paid;
+    return getTimeShare(p) - paid;
   };
 
   const settlements = total > 0 ? calcSettlements(people, getOwes) : [];

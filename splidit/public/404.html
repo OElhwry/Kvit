@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 · SplidIt</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg:          #060c08;
+        --primary:     #34d399;
+        --primary-dk:  #10b981;
+        --text:        #e6f4ec;
+        --text-2:      #9aa9a3;
+        --text-3:      #5d6e66;
+        --font:        'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        --mono:        'JetBrains Mono', ui-monospace, Consolas, monospace;
+      }
+
+      html, body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ── BACKGROUND LAYERS ─────────────────────────────────── */
+      .bg-grad {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        background:
+          radial-gradient(ellipse 85% 50% at 50% 0%,  rgba(16,185,129,0.12) 0%, transparent 65%),
+          radial-gradient(ellipse 60% 40% at 90% 70%, rgba(5,150,105,0.07) 0%, transparent 70%),
+          radial-gradient(ellipse 50% 30% at 8% 92%,  rgba(34,197,94,0.05) 0%, transparent 70%);
+      }
+      .bg-dots {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        background-image: radial-gradient(circle, rgba(52,211,153,0.07) 1px, transparent 1px);
+        background-size: 28px 28px;
+        -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 30%, transparent 100%);
+        mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 30%, transparent 100%);
+      }
+
+      /* ── LAYOUT ────────────────────────────────────────────── */
+      .page {
+        position: relative; z-index: 1;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 48px 24px;
+        text-align: center;
+      }
+
+      /* ── BRAND MARK ────────────────────────────────────────── */
+      .mark {
+        width: 56px; height: 56px; border-radius: 16px;
+        background: linear-gradient(140deg, #34d399 0%, #10b981 50%, #047857 100%);
+        display: inline-flex; align-items: center; justify-content: center;
+        box-shadow: 0 8px 32px rgba(52,211,153,0.32), inset 0 1px 0 rgba(255,255,255,0.18);
+        margin-bottom: 28px;
+        position: relative;
+        animation: markFloat 3s ease-in-out infinite;
+      }
+      .mark::after {
+        content: ""; position: absolute; inset: -2px; border-radius: 18px;
+        background: linear-gradient(140deg, rgba(52,211,153,0.4), transparent 60%);
+        z-index: -1; filter: blur(12px);
+      }
+      @keyframes markFloat {
+        0%, 100% { transform: translateY(0);   }
+        50%       { transform: translateY(-6px);}
+      }
+
+      /* ── 404 DISPLAY ───────────────────────────────────────── */
+      .code {
+        font-family: var(--mono);
+        font-size: clamp(72px, 18vw, 120px);
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -4px;
+        background: linear-gradient(180deg, #f0fdf4 0%, rgba(52,211,153,0.5) 100%);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 4px;
+      }
+
+      .tagline {
+        font-family: var(--mono); font-size: 13px; font-weight: 500;
+        color: rgba(52,211,153,0.70); letter-spacing: 0.06em;
+        margin-bottom: 20px;
+        text-transform: lowercase;
+      }
+
+      .message {
+        font-size: 15px; font-weight: 500;
+        color: var(--text-2);
+        max-width: 320px;
+        margin-bottom: 36px;
+        line-height: 1.6;
+      }
+
+      /* ── DIVIDER ───────────────────────────────────────────── */
+      .divider {
+        width: 40px; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(52,211,153,0.4), transparent);
+        margin: 0 auto 36px;
+      }
+
+      /* ── CTA BUTTON ────────────────────────────────────────── */
+      .cta {
+        display: inline-flex; align-items: center; gap: 8px;
+        height: 42px; padding: 0 22px; border-radius: 99px;
+        background: linear-gradient(135deg, rgba(52,211,153,0.18), rgba(52,211,153,0.08));
+        border: 1px solid rgba(52,211,153,0.32);
+        color: #6ee7b7;
+        font-family: var(--font); font-size: 13px; font-weight: 600;
+        letter-spacing: 0.02em;
+        text-decoration: none;
+        cursor: pointer;
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(52,211,153,0.12);
+        transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+        outline: none;
+      }
+      .cta:hover {
+        border-color: rgba(52,211,153,0.60);
+        color: #d1fae5;
+        background: linear-gradient(135deg, rgba(52,211,153,0.30), rgba(52,211,153,0.14));
+        box-shadow: 0 6px 28px rgba(52,211,153,0.22);
+      }
+      .cta-arrow {
+        font-size: 16px; line-height: 1;
+        transition: transform 0.2s;
+      }
+      .cta:hover .cta-arrow { transform: translateX(3px); }
+
+      /* ── FOOTER MONO ───────────────────────────────────────── */
+      .footer {
+        position: fixed; bottom: 28px; left: 0; right: 0;
+        text-align: center; z-index: 1;
+        font-family: var(--mono); font-size: 11px;
+        color: var(--text-3); letter-spacing: 0.04em;
+      }
+
+      /* ── SELECTION ─────────────────────────────────────────── */
+      ::selection { background: var(--primary); color: #052e1f; }
+    </style>
+  </head>
+  <body>
+    <div class="bg-grad"></div>
+    <div class="bg-dots"></div>
+
+    <main class="page">
+      <!-- Brand mark -->
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 38 38" fill="none" width="28" height="28">
+          <rect x="0"     y="9.92" width="15.46" height="6.08" rx="3.04" fill="rgba(255,255,255,0.96)"/>
+          <rect x="22.54" y="9.92" width="15.46" height="6.08" rx="3.04" fill="rgba(255,255,255,0.96)"/>
+          <rect x="0"     y="22"   width="38"    height="6.08" rx="3.04" fill="rgba(255,255,255,0.96)"/>
+        </svg>
+      </div>
+
+      <!-- 404 -->
+      <div class="code">404</div>
+      <div class="tagline">~ page not found ~</div>
+
+      <div class="divider"></div>
+
+      <p class="message">
+        This page got lost in the split.<br>
+        Let's get you back to even.
+      </p>
+
+      <a class="cta" href="/">
+        Go home <span class="cta-arrow">→</span>
+      </a>
+    </main>
+
+    <footer class="footer">splidit · call it even</footer>
+  </body>
+</html>

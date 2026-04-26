@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 // (configured to serve /docs on main) picks up every new build.
 export default defineConfig({
   plugins: [react()],
-  base: '/SplidIt/',
+  base: '/',
   build: {
     outDir: '../docs',
     emptyOutDir: true,

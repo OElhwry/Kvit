@@ -170,24 +170,58 @@ h1, h2, h3 { font-family: var(--font); font-size: inherit; font-weight: inherit;
   50%      { opacity: 0.55;transform: scale(0.85); }
 }
 
+.kv-hero-cta-wrap {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+}
 .kv-hero-cta {
+  position: relative; z-index: 2;
   display: inline-flex; align-items: center; gap: 8px;
   height: 42px; padding: 0 20px; border-radius: 99px;
   background: linear-gradient(135deg, rgba(52,211,153,0.18), rgba(52,211,153,0.08));
   border: 1px solid rgba(52,211,153,0.32);
   color: #6ee7b7; font-family: var(--font); font-size: 13px; font-weight: 600;
   letter-spacing: 0.02em;
-  cursor: pointer; transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+  cursor: pointer;
+  transition: background 0.22s, border-color 0.22s, color 0.22s;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(52,211,153,0.12);
+  outline: none;
 }
 .kv-hero-cta:hover {
-  border-color: rgba(52,211,153,0.55); color: #d1fae5;
-  background: linear-gradient(135deg, rgba(52,211,153,0.28), rgba(52,211,153,0.12));
-  transform: translateY(-1px);
-  box-shadow: 0 8px 28px rgba(52,211,153,0.25);
+  border-color: rgba(52,211,153,0.6); color: #d1fae5;
+  background: linear-gradient(135deg, rgba(52,211,153,0.30), rgba(52,211,153,0.14));
 }
-.kv-hero-cta:active { transform: translateY(0) scale(0.98); }
+.kv-hero-cta:focus-visible {
+  outline: 2px solid var(--primary); outline-offset: 4px;
+}
+.kv-hero-cta.hint {
+  border-color: rgba(52,211,153,0.55);
+  color: #d1fae5;
+}
+/* expanding rings behind CTA — only when first-visit hint is active */
+.kv-hero-cta-ring {
+  position: absolute; inset: -4px; z-index: 1;
+  border-radius: 99px; pointer-events: none;
+  border: 1.5px solid rgba(52,211,153,0.65);
+  box-shadow: 0 0 24px rgba(52,211,153,0.4);
+}
+.kv-hero-cta-ring-2 {
+  border-color: rgba(110,231,183,0.5);
+  border-width: 1px;
+}
+
+/* "New here?" prompt above the CTA */
+.kv-hero-tip {
+  font-size: 12px; font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px rgba(52,211,153,0.45);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.kv-hero-tip::after {
+  content: "↓"; font-size: 13px; opacity: 0.7;
+}
 
 .kv-scroll-cue {
   display: inline-flex; align-items: center; justify-content: center;
@@ -281,6 +315,12 @@ input[type="number"] { -moz-appearance: textfield; }
   font-family: var(--font); font-size: 12px; font-weight: 600;
   color: var(--text-2); letter-spacing: 0.01em;
   transition: color 0.22s ease;
+  outline: none;
+}
+.kv-mode:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 9px;
 }
 .kv-mode.on   { color: #052e1f; }
 .kv-mode:hover:not(.on) { color: var(--text); }
@@ -1013,7 +1053,7 @@ function Reveal({ children, delay = 0, y = 18 }) {
 // ═════════════════════════════════════════════════════════════
 //  COMPONENT: Hero
 // ═════════════════════════════════════════════════════════════
-function Hero({ onSample, total }) {
+function Hero({ onSample, total, showHint }) {
   return (
     <header className="kv-hero">
       <motion.div
@@ -1054,19 +1094,71 @@ function Hero({ onSample, total }) {
         <span className="kv-hero-pill">Instant settle-up</span>
       </motion.div>
 
-      <motion.button
-        type="button"
-        className="kv-hero-cta"
-        onClick={onSample}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.38 }}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-      >
-        <Sparkles size={14} />
-        Try with sample data
-      </motion.button>
+      {showHint && (
+        <motion.p
+          className="kv-hero-tip"
+          aria-hidden="true"
+          initial={{ opacity: 0, y: -3 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.55 }}
+        >
+          New here? Start with a demo
+        </motion.p>
+      )}
+
+      <div className="kv-hero-cta-wrap">
+        {showHint && (
+          <>
+            <motion.span
+              className="kv-hero-cta-ring"
+              aria-hidden="true"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: [0, 0.65, 0], scale: [1, 1.28, 1.45] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.25, delay: 0.7, ease: "easeOut" }}
+            />
+            <motion.span
+              className="kv-hero-cta-ring kv-hero-cta-ring-2"
+              aria-hidden="true"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: [0, 0.4, 0], scale: [1, 1.35, 1.6] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.25, delay: 1.3, ease: "easeOut" }}
+            />
+          </>
+        )}
+        <motion.button
+          type="button"
+          className={`kv-hero-cta${showHint ? " hint" : ""}`}
+          onClick={onSample}
+          initial={{ opacity: 0, y: 8 }}
+          animate={
+            showHint
+              ? {
+                  opacity: 1, y: 0,
+                  scale: [1, 1.04, 1],
+                  boxShadow: [
+                    "0 4px 20px rgba(52,211,153,0.18)",
+                    "0 10px 48px rgba(52,211,153,0.7)",
+                    "0 4px 20px rgba(52,211,153,0.18)",
+                  ],
+                }
+              : { opacity: 1, y: 0, scale: 1, boxShadow: "0 4px 20px rgba(52,211,153,0.12)" }
+          }
+          transition={
+            showHint
+              ? {
+                  default:   { duration: 0.5, delay: 0.38 },
+                  scale:     { duration: 1.6, delay: 0.7, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.2 },
+                  boxShadow: { duration: 1.6, delay: 0.7, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.2 },
+                }
+              : { duration: 0.4, delay: 0 }
+          }
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.96 }}
+        >
+          <Sparkles size={14} />
+          Try with sample data
+        </motion.button>
+      </div>
 
       {total === 0 && (
         <motion.div
@@ -1093,16 +1185,41 @@ function ModePicker({ mode, setMode }) {
   ];
   const idx = MODES.findIndex(m => m.id === mode);
   const active = MODES[idx] || MODES[0];
+  const tabRefs = useRef([]);
+
+  const onKeyDown = (e) => {
+    let next = idx;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (idx + 1) % MODES.length;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (idx - 1 + MODES.length) % MODES.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End")  next = MODES.length - 1;
+    else return;
+    e.preventDefault();
+    setMode(MODES[next].id);
+    requestAnimationFrame(() => tabRefs.current[next]?.focus());
+  };
 
   return (
     <div>
-      <div className="kv-modes">
-        {MODES.map(m => {
+      <div
+        className="kv-modes"
+        role="tablist"
+        aria-label="Split mode"
+        aria-orientation="horizontal"
+        onKeyDown={onKeyDown}
+      >
+        {MODES.map((m, i) => {
           const on = mode === m.id;
           return (
             <button
               key={m.id}
+              ref={el => (tabRefs.current[i] = el)}
               type="button"
+              role="tab"
+              id={`kv-mode-tab-${m.id}`}
+              aria-selected={on}
+              aria-controls="kv-mode-desc"
+              tabIndex={on ? 0 : -1}
               className={`kv-mode${on ? " on" : ""}`}
               onClick={() => setMode(m.id)}
               style={{ position: "relative" }}
@@ -1111,11 +1228,12 @@ function ModePicker({ mode, setMode }) {
                 <motion.span
                   layoutId="kv-mode-ind"
                   className="kv-mode-ind"
+                  aria-hidden="true"
                   transition={{ type: "spring", stiffness: 380, damping: 32 }}
                 />
               )}
               <span style={{ position: "relative", zIndex: 2, display: "inline-flex", alignItems: "center", gap: 6 }}>
-                <m.Icon size={13} />
+                <m.Icon size={13} aria-hidden="true" />
                 {m.label}
               </span>
             </button>
@@ -1125,6 +1243,7 @@ function ModePicker({ mode, setMode }) {
       <AnimatePresence mode="wait">
         <motion.p
           key={active.id}
+          id="kv-mode-desc"
           className="kv-mode-desc"
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1777,6 +1896,7 @@ export default function App() {
 
   // Restore: URL data takes priority, then fall back to localStorage
   const [hydrated, setHydrated] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   useEffect(() => {
     const apply = (parsed) => {
       const ppl = parsed.people.map(p => ({ ...p, percent: p.percent ?? 0, minutes: p.minutes ?? 0 }));
@@ -1791,12 +1911,20 @@ export default function App() {
     if (urlData) {
       try { apply(JSON.parse(atob(urlData))); setHydrated(true); return; } catch {}
     }
+    let hadStored = false;
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) apply(JSON.parse(stored));
+      if (stored) { apply(JSON.parse(stored)); hadStored = true; }
     } catch {}
+    if (!hadStored) setShowHint(true);
     setHydrated(true);
   }, []);
+
+  // Dismiss the first-visit pulse once the user starts engaging with the form
+  useEffect(() => {
+    if (!showHint) return;
+    if (description || amount || bookingDuration) setShowHint(false);
+  }, [showHint, description, amount, bookingDuration]);
 
   // Auto-save to localStorage on change (only after first hydrate to avoid clobbering)
   useEffect(() => {
@@ -1876,6 +2004,7 @@ export default function App() {
 
   // ── sample data — for hero CTA ───────────────────────────
   const loadSample = () => {
+    setShowHint(false);
     setMode("time");
     setBookingDuration("90");
     setAmount("48");
@@ -1906,6 +2035,7 @@ export default function App() {
     if (window.location.search) {
       window.history.replaceState({}, "", window.location.pathname);
     }
+    setShowHint(true);
     showToast("Reset · ready for the next split");
   };
 
@@ -1964,7 +2094,7 @@ export default function App() {
       />
 
       <div className="kv-wrap">
-        <Hero onSample={loadSample} total={total} />
+        <Hero onSample={loadSample} total={total} showHint={showHint} />
 
         <div id="kv-builder" />
 

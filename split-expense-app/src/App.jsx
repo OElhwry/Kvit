@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from "react";
-import html2canvas from "html2canvas";
+import { useState, useRef, useEffect, forwardRef } from "react";
 import {
   motion,
   AnimatePresence,
@@ -10,8 +9,10 @@ import {
 } from "framer-motion";
 import {
   FileText, Link as LinkIcon, Image as ImageIcon, Check, Plus, ArrowRight,
-  Sparkles, Clock, Scale, Percent, ChevronDown,
+  Sparkles, Clock, Scale, Percent, ChevronDown, RotateCcw,
 } from "lucide-react";
+
+const STORAGE_KEY = "kvit:state:v1";
 
 // ════════════════════════════════════════════════════════════════
 //  KVIT — "Call it even."
@@ -507,6 +508,24 @@ input[type="number"] { -moz-appearance: textfield; }
   background: var(--green-dim);
 }
 
+/* ── RESET LINK ────────────────────────────────────────────── */
+.kv-reset {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin: 14px auto 0; padding: 8px 16px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--text-3); font-family: var(--font);
+  font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
+  cursor: pointer; border-radius: 8px;
+  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+.kv-reset:hover {
+  color: var(--red); border-color: rgba(248,113,113,0.18);
+  background: rgba(248,113,113,0.04);
+}
+.kv-reset:focus-visible {
+  outline: 2px solid var(--primary); outline-offset: 2px;
+}
+
 /* ── TOAST ─────────────────────────────────────────────────── */
 .kv-toast {
   position: fixed; bottom: 28px; left: 50%;
@@ -524,33 +543,203 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 .kv-toast.up { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ── HIDDEN SHARE CARD ─────────────────────────────────────── */
+/* ── HIDDEN SHARE CARD (html2canvas-safe — no backdrop-filter / mask) ─── */
 .kv-hidden { position: absolute; left: -9999px; top: 0; }
 .kv-share {
-  width: 360px; padding: 26px; border-radius: 18px;
-  background: linear-gradient(160deg, #0a1410 0%, #060c08 100%);
+  width: 400px; padding: 28px;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse 70% 40% at 90% 0%,   rgba(52,211,153,0.13) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 35% at 0% 100%,  rgba(16,185,129,0.07) 0%, transparent 70%),
+    linear-gradient(170deg, #0c1812 0%, #060c08 55%, #040a06 100%);
   color: var(--text);
-  border: 1px solid rgba(52,211,153,0.18);
-  box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+  border: 1px solid rgba(52,211,153,0.20);
+  box-shadow: 0 16px 56px rgba(0,0,0,0.55);
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font);
 }
-.kv-share-hdr  { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+/* faux dot grid via background-image — html2canvas-safe */
+.kv-share::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(52,211,153,0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.5; pointer-events: none;
+}
+
+/* HEADER */
+.kv-share-hdr  {
+  display: flex; align-items: center; gap: 11px;
+  margin-bottom: 22px; position: relative;
+}
 .kv-share-mark {
-  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-  background: linear-gradient(140deg, #34d399, #10b981, #047857);
+  width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+  background: linear-gradient(140deg, #34d399 0%, #10b981 50%, #047857 100%);
   display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(52,211,153,0.32), inset 0 1px 0 rgba(255,255,255,0.2);
 }
-.kv-share-brand { font-size: 16px; font-weight: 800; letter-spacing: -0.4px; }
-.kv-share-desc  { font-size: 12px; color: var(--text-2); }
+.kv-share-brand {
+  font-size: 17px; font-weight: 800; letter-spacing: -0.5px; color: var(--text);
+  display: flex; align-items: center; gap: 7px;
+}
+.kv-share-brand-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--primary); box-shadow: 0 0 8px var(--primary);
+}
+.kv-share-desc  { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+/* HERO AMOUNT */
+.kv-share-hero {
+  position: relative;
+  padding: 18px 0 14px;
+  border-top: 1px solid rgba(52,211,153,0.14);
+  border-bottom: 1px solid rgba(52,211,153,0.14);
+  margin-bottom: 18px;
+}
+.kv-share-hero-lbl {
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: rgba(52,211,153,0.7); margin-bottom: 6px;
+}
 .kv-share-amount {
-  font-family: var(--mono); font-size: 36px; font-weight: 700; letter-spacing: -1.2px;
-  margin: 14px 0; color: var(--primary);
+  font-family: var(--mono); font-size: 42px; font-weight: 700;
+  letter-spacing: -1.6px; line-height: 1;
+  color: #6ee7b7;
+  margin-bottom: 8px;
+  font-feature-settings: "tnum" on;
+  text-shadow: 0 0 24px rgba(52,211,153,0.3);
+}
+.kv-share-meta {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  font-size: 11px; color: var(--text-2);
+}
+.kv-share-meta-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 99px;
+  background: rgba(52,211,153,0.08);
+  border: 1px solid rgba(52,211,153,0.18);
+  color: rgba(230,244,236,0.78);
+  font-size: 10.5px; font-weight: 500;
+}
+
+/* SECTION */
+.kv-share-sec { position: relative; margin-bottom: 16px; }
+.kv-share-sec:last-of-type { margin-bottom: 0; }
+.kv-share-sec-lbl {
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(52,211,153,0.6); margin-bottom: 9px;
+}
+
+/* TIMELINE row inside share */
+.kv-share-tl-row {
+  display: grid; grid-template-columns: 90px 1fr 44px;
+  gap: 8px; align-items: center; margin-bottom: 6px;
+}
+.kv-share-tl-row:last-child { margin-bottom: 0; }
+.kv-share-tl-name {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11.5px; color: var(--text); font-weight: 500;
+  white-space: nowrap; overflow: hidden;
+}
+.kv-share-tl-av {
+  width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8.5px; font-weight: 700; color: #06140d;
+}
+.kv-share-tl-bar {
+  height: 8px; background: rgba(255,255,255,0.05);
+  border-radius: 99px; overflow: hidden;
+  border: 1px solid rgba(52,211,153,0.10);
+}
+.kv-share-tl-fill { height: 100%; border-radius: 99px; }
+.kv-share-tl-dur {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text-3); text-align: right;
   font-feature-settings: "tnum" on;
 }
-.kv-share-div   { height: 1px; background: var(--border); margin: 12px 0; }
-.kv-share-row   { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 13px; }
-.kv-share-person { color: var(--text-2); }
-.kv-share-pos    { font-family: var(--mono); color: var(--green); font-weight: 700; font-feature-settings: "tnum" on; }
-.kv-share-neg    { font-family: var(--mono); color: var(--red);   font-weight: 700; font-feature-settings: "tnum" on; }
+
+/* BALANCE row inside share */
+.kv-share-bal-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; margin-bottom: 5px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(52,211,153,0.08);
+  border-radius: 10px;
+}
+.kv-share-bal-row:last-child { margin-bottom: 0; }
+.kv-share-av {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #06140d;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.kv-share-bal-name {
+  flex: 1; min-width: 0;
+}
+.kv-share-bal-pname {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kv-share-bal-paid {
+  font-size: 10.5px; color: var(--text-3); margin-top: 1px;
+  font-feature-settings: "tnum" on;
+}
+.kv-share-bal-amt {
+  font-family: var(--mono); font-size: 14px; font-weight: 700;
+  letter-spacing: -0.4px;
+  font-feature-settings: "tnum" on;
+}
+.kv-share-bal-amt.pos  { color: var(--green); }
+.kv-share-bal-amt.neg  { color: var(--red); }
+.kv-share-bal-amt.zero { color: var(--text-3); }
+
+/* SETTLEMENT row inside share */
+.kv-share-set-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px; margin-bottom: 5px;
+  background: rgba(52,211,153,0.04);
+  border: 1px solid rgba(52,211,153,0.12);
+  border-radius: 10px;
+}
+.kv-share-set-row:last-child { margin-bottom: 0; }
+.kv-share-set-side {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--text);
+}
+.kv-share-set-arrow { color: var(--primary); display: flex; align-items: center; }
+.kv-share-set-amt {
+  margin-left: auto;
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: var(--primary);
+  font-feature-settings: "tnum" on;
+}
+
+/* SETTLED state in share */
+.kv-share-settled {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 14px;
+  background: rgba(52,211,153,0.07);
+  border: 1px solid rgba(52,211,153,0.22);
+  border-radius: 12px;
+  font-size: 13px; font-weight: 600; color: var(--green);
+  letter-spacing: -0.1px;
+}
+
+/* FOOTER tagline */
+.kv-share-foot {
+  margin-top: 18px; padding-top: 14px;
+  border-top: 1px solid rgba(52,211,153,0.10);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(230,244,236,0.42); font-weight: 600;
+  position: relative;
+}
+.kv-share-foot-brand {
+  display: flex; align-items: center; gap: 6px;
+  color: rgba(52,211,153,0.7);
+}
+.kv-share-foot-tag { color: rgba(230,244,236,0.45); }
 
 /* ── SCROLLBAR ─────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -1116,6 +1305,8 @@ function TimePersonRow({ person, index, onUpdate, bookingDuration, owes, timeSha
         step="5"
         value={mins}
         onChange={e => onUpdate("minutes", Number(e.target.value))}
+        aria-label={`${person.name || "Person"} time played`}
+        aria-valuetext={`${formatMins(mins)} of ${formatMins(totalMin)}`}
         style={{
           background: `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, rgba(255,255,255,0.06) ${pct}%, rgba(255,255,255,0.06) 100%)`
         }}
@@ -1373,9 +1564,10 @@ function SettlementList({ settlements, colorMap }) {
 // ═════════════════════════════════════════════════════════════
 function SettledBurst() {
   return (
-    <div className="kv-settled">
+    <div className="kv-settled" role="status" aria-label="All settled — no transfers needed">
       <motion.div
         className="kv-settled-icon-wrap"
+        aria-hidden="true"
         initial={{ scale: 0.4, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 280, damping: 18, delay: 0.05 }}
@@ -1418,6 +1610,141 @@ function SettledBurst() {
 }
 
 // ═════════════════════════════════════════════════════════════
+//  COMPONENT: ShareCard — html2canvas-safe export receipt
+// ═════════════════════════════════════════════════════════════
+const ShareCard = forwardRef(function ShareCard(
+  { description, total, people, mode, bookingDuration, getOwes, settlements },
+  ref
+) {
+  const totalMin    = Number(bookingDuration) || 0;
+  const denominator = totalMin > 0
+    ? totalMin
+    : people.reduce((s, p) => s + (Number(p.minutes) || 0), 0);
+
+  const modeLabel =
+    mode === "equal"  ? "Equal split"
+  : mode === "manual" ? "Custom %"
+  :                     "By time";
+
+  return (
+    <div className="kv-share" ref={ref}>
+      {/* Header: brand + description */}
+      <div className="kv-share-hdr">
+        <div className="kv-share-mark"><KvitMark size={20} /></div>
+        <div>
+          <div className="kv-share-brand">
+            Kvit <span className="kv-share-brand-dot" />
+          </div>
+          <div className="kv-share-desc">{description || "Untitled split"}</div>
+        </div>
+      </div>
+
+      {/* Hero amount */}
+      <div className="kv-share-hero">
+        <div className="kv-share-hero-lbl">Total</div>
+        <div className="kv-share-amount">£{total.toFixed(2)}</div>
+        <div className="kv-share-meta">
+          <span className="kv-share-meta-pill">{people.length} {people.length === 1 ? "person" : "people"}</span>
+          <span className="kv-share-meta-pill">{modeLabel}</span>
+          {mode === "time" && totalMin > 0 && (
+            <span className="kv-share-meta-pill">{formatMins(totalMin)} session</span>
+          )}
+        </div>
+      </div>
+
+      {/* Timeline (time mode only) */}
+      {mode === "time" && denominator > 0 && (
+        <div className="kv-share-sec">
+          <div className="kv-share-sec-lbl">Participation</div>
+          {people.map((p, i) => {
+            const mins  = Number(p.minutes) || 0;
+            const pct   = Math.min((mins / denominator) * 100, 100);
+            const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
+            return (
+              <div key={p.id} className="kv-share-tl-row">
+                <div className="kv-share-tl-name">
+                  <div className="kv-share-tl-av" style={{ background: color }}>{init(p.name)}</div>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{p.name || "—"}</span>
+                </div>
+                <div className="kv-share-tl-bar">
+                  <div className="kv-share-tl-fill" style={{ width: `${pct}%`, background: color }} />
+                </div>
+                <span className="kv-share-tl-dur">{formatMins(mins)}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Balances */}
+      <div className="kv-share-sec">
+        <div className="kv-share-sec-lbl">Balances</div>
+        {people.map((p, i) => {
+          const owes  = getOwes(p);
+          const isPos = owes < -0.005;
+          const isNeg = owes >  0.005;
+          const cls   = isPos ? "pos" : isNeg ? "neg" : "zero";
+          const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
+          const paid  = Number(p.paid) || 0;
+          const subText = mode === "time"
+            ? `Played ${formatMins(Number(p.minutes) || 0)} · paid £${paid.toFixed(2)}`
+            : `Paid £${paid.toFixed(2)}`;
+          return (
+            <div key={p.id} className="kv-share-bal-row">
+              <div className="kv-share-av" style={{ background: color }}>{init(p.name)}</div>
+              <div className="kv-share-bal-name">
+                <div className="kv-share-bal-pname">{p.name || "—"}</div>
+                <div className="kv-share-bal-paid">{subText}</div>
+              </div>
+              <div className={`kv-share-bal-amt ${cls}`}>
+                {isPos ? "+" : isNeg ? "−" : ""}£{fmt(owes)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Settlements */}
+      <div className="kv-share-sec">
+        <div className="kv-share-sec-lbl">Settle up</div>
+        {settlements.length === 0 ? (
+          <div className="kv-share-settled">
+            <Check size={14} strokeWidth={3} /> All settled — no transfers needed
+          </div>
+        ) : (
+          settlements.map((s, i) => {
+            const fromColor = AVATAR_COLORS[people.findIndex(p => p.name === s.from) % AVATAR_COLORS.length] || AVATAR_COLORS[0];
+            const toColor   = AVATAR_COLORS[people.findIndex(p => p.name === s.to)   % AVATAR_COLORS.length] || AVATAR_COLORS[1];
+            return (
+              <div key={i} className="kv-share-set-row">
+                <div className="kv-share-set-side">
+                  <div className="kv-share-tl-av" style={{ background: fromColor }}>{init(s.from)}</div>
+                  {s.from}
+                </div>
+                <div className="kv-share-set-arrow"><ArrowRight size={12} /></div>
+                <div className="kv-share-set-side">
+                  <div className="kv-share-tl-av" style={{ background: toColor }}>{init(s.to)}</div>
+                  {s.to}
+                </div>
+                <span className="kv-share-set-amt">£{s.amount.toFixed(2)}</span>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="kv-share-foot">
+        <span className="kv-share-foot-brand">
+          <span className="kv-share-brand-dot" /> KVIT
+        </span>
+        <span className="kv-share-foot-tag">CALL · IT · EVEN</span>
+      </div>
+    </div>
+  );
+});
+
+// ═════════════════════════════════════════════════════════════
 //  MAIN APP
 // ═════════════════════════════════════════════════════════════
 export default function App() {
@@ -1448,20 +1775,42 @@ export default function App() {
       "radial-gradient(ellipse at 60% 0%, #0a1410 0%, #060c08 60%, #040a06 100%)";
   }, []);
 
-  // Restore from shareable URL
+  // Restore: URL data takes priority, then fall back to localStorage
+  const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
-    const data = new URLSearchParams(window.location.search).get("data");
-    if (!data) return;
-    try {
-      const parsed = JSON.parse(atob(data));
+    const apply = (parsed) => {
       const ppl = parsed.people.map(p => ({ ...p, percent: p.percent ?? 0, minutes: p.minutes ?? 0 }));
       setPeople(ppl);
-      setAmount(parsed.amount);
-      setDescription(parsed.description);
+      setAmount(parsed.amount ?? "");
+      setDescription(parsed.description ?? "");
       setBookingDuration(parsed.bookingDuration || "");
       setMode(parsed.mode || (ppl.some(p => Number(p.percent) > 0) ? "manual" : "equal"));
+    };
+
+    const urlData = new URLSearchParams(window.location.search).get("data");
+    if (urlData) {
+      try { apply(JSON.parse(atob(urlData))); setHydrated(true); return; } catch {}
+    }
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) apply(JSON.parse(stored));
     } catch {}
+    setHydrated(true);
   }, []);
+
+  // Auto-save to localStorage on change (only after first hydrate to avoid clobbering)
+  useEffect(() => {
+    if (!hydrated) return;
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ people, amount, description, mode, bookingDuration }),
+        );
+      } catch {}
+    }, 250);
+    return () => clearTimeout(t);
+  }, [hydrated, people, amount, description, mode, bookingDuration]);
 
   // ── derived ──────────────────────────────────────────────
   const total    = Number(amount) || 0;
@@ -1544,6 +1893,22 @@ export default function App() {
     }, 280);
   };
 
+  const reset = () => {
+    setMode("equal");
+    setAmount("");
+    setDescription("");
+    setBookingDuration("");
+    setPeople([
+      { id: 1, name: "Alice", paid: "", percent: 0, minutes: 0 },
+      { id: 2, name: "Bob",   paid: "", percent: 0, minutes: 0 },
+    ]);
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    if (window.location.search) {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+    showToast("Reset · ready for the next split");
+  };
+
   // ── share actions ────────────────────────────────────────
   const copyText = () => {
     let t = `${description || (mode === "time" ? "Booking" : "Expense")}\nTotal: £${total.toFixed(2)}\n`;
@@ -1561,11 +1926,21 @@ export default function App() {
     flash("text"); showToast("Copied as text");
   };
   const copyImage = async () => {
-    const canvas = await html2canvas(shareRef.current, { backgroundColor: null, scale: 2 });
-    canvas.toBlob(async (blob) => {
-      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-      flash("image"); showToast("Copied as image");
-    });
+    try {
+      showToast("Rendering image…");
+      const { default: html2canvas } = await import("html2canvas");
+      const canvas = await html2canvas(shareRef.current, { backgroundColor: null, scale: 2 });
+      canvas.toBlob(async (blob) => {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          flash("image"); showToast("Copied as image");
+        } catch {
+          showToast("Couldn't copy — clipboard blocked");
+        }
+      });
+    } catch {
+      showToast("Image render failed");
+    }
   };
   const copyLink = () => {
     const encoded = btoa(JSON.stringify({ people, amount, description, mode, bookingDuration }));
@@ -1770,6 +2145,10 @@ export default function App() {
               {copied === "link" ? <Check size={14} /> : <LinkIcon size={14} />} Link
             </motion.button>
           </div>
+
+          <button className="kv-reset" onClick={reset} type="button" aria-label="Reset all data">
+            <RotateCcw size={11} /> Clear &amp; start fresh
+          </button>
         </Reveal>
 
         <footer className="kv-footer">
@@ -1779,46 +2158,27 @@ export default function App() {
       </div>
 
       {/* Toast */}
-      <div className={`kv-toast${toast.show ? " up" : ""}`}>
+      <div
+        className={`kv-toast${toast.show ? " up" : ""}`}
+        role="status"
+        aria-live="polite"
+      >
         <Check size={13} color="var(--primary)" />
         {toast.msg}
       </div>
 
       {/* Hidden share card (image capture) */}
       <div className="kv-hidden">
-        <div className="kv-share" ref={shareRef}>
-          <div className="kv-share-hdr">
-            <div className="kv-share-mark"><KvitMark size={18} /></div>
-            <div>
-              <div className="kv-share-brand">Kvit</div>
-              <div className="kv-share-desc">{description || "Expense"}</div>
-            </div>
-          </div>
-          <div className="kv-share-amount">£{total.toFixed(2)}</div>
-          <div className="kv-share-div" />
-          {people.map((p, i) => {
-            const owes = getOwes(p);
-            return (
-              <div key={i} className="kv-share-row">
-                <span className="kv-share-person">{p.name}</span>
-                <span className={owes > 0.005 ? "kv-share-neg" : "kv-share-pos"}>
-                  {owes > 0.005 ? "−" : "+"}£{fmt(owes)}
-                </span>
-              </div>
-            );
-          })}
-          {settlements.length > 0 && (
-            <>
-              <div className="kv-share-div" />
-              {settlements.map((s, i) => (
-                <div key={i} className="kv-share-row">
-                  <span className="kv-share-person">{s.from} → {s.to}</span>
-                  <span className="kv-share-neg">£{s.amount.toFixed(2)}</span>
-                </div>
-              ))}
-            </>
-          )}
-        </div>
+        <ShareCard
+          ref={shareRef}
+          description={description}
+          total={total}
+          people={people}
+          mode={mode}
+          bookingDuration={bookingDuration}
+          getOwes={getOwes}
+          settlements={settlements}
+        />
       </div>
     </div>
   );

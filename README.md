@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://splidit.co.uk"><img src="https://img.shields.io/badge/live-splidit.co.uk-34d399?style=for-the-badge" alt="Live website"></a>
-  <a href ="https://github.com/OElhwry/SplidIt/releases/tag/v.1.0.1"><img src="https://img.shields.io/badge/version-1.0.0-6ee7b7?style=for-the-badge" alt="Version 1.0.0"></a>
+  <a href ="https://github.com/OElhwry/SplidIt/releases/tag/v.1.0.1"><img src="https://img.shields.io/badge/version-1.0.1-6ee7b7?style=for-the-badge" alt="Version 1.0.1"></a>
   <img src="https://img.shields.io/badge/no%20account-required-10b981?style=for-the-badge" alt="No account required">
   <img src="https://img.shields.io/badge/license-MIT-737373?style=for-the-badge" alt="MIT">
 </p>

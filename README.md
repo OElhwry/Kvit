@@ -24,7 +24,6 @@
   <img src="https://img.shields.io/badge/lucide-icons-34d399?style=flat-square&logo=lucide&logoColor=white" alt="Lucide">
   <img src="https://img.shields.io/badge/html2canvas-lazy%20loaded-f59e0b?style=flat-square" alt="html2canvas lazy">
   <img src="https://img.shields.io/badge/github%20pages-deployed-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Pages">
-  <img src="https://img.shields.io/badge/built%20with-claude-D97757?style=flat-square&logo=anthropic&logoColor=white" alt="Built with Claude">
 </p>
 
 <p align="center">
@@ -41,7 +40,7 @@
 
 ## The problem
 
-Splitting a group bill takes more time than the meal that caused it. Splitwise is overkill for a one-off court hire or a single dinner. Notes-app math gets messy the moment people pre-paid different amounts. And when the booking was time-based — padel, tennis, an hourly studio rental — equal splits feel unfair if one player only showed up for the second half.
+Splitting a group bill takes more time than the meal that caused it. Splitwise is overkill for a one-off court hire or a single dinner. Notes-app math gets messy the moment people pre-paid different amounts. And when the booking was time-based, padel, tennis, an hourly studio rental, equal splits feel unfair if one player only showed up for the second half.
 
 ## The solution
 
